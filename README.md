@@ -47,8 +47,7 @@ learn-test-solution/
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd learn-test-solution
+git clone https://github.com/mohandas697/ti_test_project.git
 
 # Start all services
 docker-compose up --build
@@ -59,37 +58,6 @@ docker-compose up --build
 - **FastAPI Docs**: http://localhost:8000/docs
 - **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
 - **Health Check**: http://localhost:8000/health
-
-## Usage Examples
-
-### WebSocket Connection (Recommended)
-
-```javascript
-// Connect to WebSocket
-const ws = new WebSocket('ws://localhost:8000/ws');
-
-ws.onopen = function(event) {
-    console.log('Connected to WebSocket');
-    
-    // Send a message
-    ws.send('hello');
-};
-
-ws.onmessage = function(event) {
-    console.log('Received:', event.data);
-    // Expected: "hello world"
-};
-```
-
-### HTTP Streaming Endpoint
-
-```bash
-# Test streaming response
-curl -N http://localhost:8000/stream/hello
-
-# Expected output:
-# data: hello world
-```
 
 ### Using Postman
 
@@ -251,81 +219,6 @@ logging.basicConfig(level=logging.DEBUG)
 - **Queue Durability**: Messages persist across service restarts
 - **Connection Pooling**: RabbitMQ connections use connection pooling for efficiency
 
-## Extensions
-
-### Adding Authentication
-
-```python
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer
-
-security = HTTPBearer()
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, token: str = Depends(security)):
-    # Validate token
-    if not validate_token(token):
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-        return
-    # ... rest of the code
-```
-
-### Adding Message Persistence
-
-```python
-# Store messages in database
-async def store_message(message: str, correlation_id: str):
-    # Database storage logic
-    pass
-```
-
-### Adding Rate Limiting
-
-```python
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-
-@app.get("/stream/{message}")
-@limiter.limit("10/minute")
-async def stream_endpoint(request: Request, message: str):
-    # ... existing code
-```
-
-## Testing
-
-### Unit Tests
-
-```python
-import pytest
-from fastapi.testclient import TestClient
-from main import app
-
-client = TestClient(app)
-
-def test_health_check():
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json()["status"] == "healthy"
-```
-
-### Integration Tests
-
-```python
-import asyncio
-import websockets
-import pytest
-
-@pytest.mark.asyncio
-async def test_websocket_echo():
-    uri = "ws://localhost:8000/ws"
-    async with websockets.connect(uri) as websocket:
-        await websocket.send("hello")
-        response = await websocket.recv()
-        assert "world" in response.lower()
-```
 
 ## Security Notes
 
