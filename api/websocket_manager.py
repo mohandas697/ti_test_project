@@ -6,10 +6,8 @@ logger = logging.getLogger(__name__)
 
 class WebSocketManager:
     def __init__(self):
-        # Store WebSocket connections by connection ID
-        self.connections: Dict[str, WebSocket] = {}
-        # Store WebSocket connections by correlation ID for message routing
-        self.active_connections: Dict[str, WebSocket] = {}
+        self.connections: Dict[str, WebSocket] = {} # Store WebSocket connections by connection ID
+        self.active_connections: Dict[str, WebSocket] = {} # Store WebSocket connections by correlation ID for message routing
     
     async def connect(self, websocket: WebSocket, connection_id: str):
         """Accept WebSocket connection and store it"""
