@@ -16,19 +16,19 @@ class WebSocketManager:
         logger.info(f"WebSocket connected: {connection_id}")
     
     def disconnect(self, connection_id: str):
-        """Remove WebSocket connection"""
-        if connection_id in self.connections:
+        """Remove WebSocket connection and clean up correlation IDs"""
+        websocket = self.connections.get(connection_id)
+
+        # Step 1: Remove the connection
+        if websocket:
             del self.connections[connection_id]
             logger.info(f"WebSocket disconnected: {connection_id}")
-        
-        # Clean up any correlation ID mappings for this connection
-        to_remove = []
-        for correlation_id, ws in self.active_connections.items():
-            if connection_id in str(ws):  # Simple way to match websocket
-                to_remove.append(correlation_id)
-        
-        for correlation_id in to_remove:
-            del self.active_connections[correlation_id]
+
+        # Step 2: Remove all correlation_ids that point to this websocket
+        to_remove = [cid for cid, ws in self.active_connections.items() if ws == websocket]
+
+        for cid in to_remove:
+            del self.active_connections[cid]
     
     async def send_personal_message(self, message: str, websocket: WebSocket):
         """Send message to specific WebSocket"""
