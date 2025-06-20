@@ -114,9 +114,11 @@ class RabbitMQWorker:
             
             # Publish response
             await self.publish_response(response, correlation_id)
+            await message.ack() # ✅ Acknowledge successful handling
             
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse message JSON: {e}")
+            await message.nack(requeue=True)
         except Exception as e:
             logger.error(f"Error handling message: {e}")
     
